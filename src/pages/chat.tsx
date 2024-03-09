@@ -7,6 +7,7 @@ import SendIcon from "@mui/icons-material/Send";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import dynamic from "next/dynamic";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
+import { useRouter } from "next/router";
 
 const Picker = dynamic(
   () => {
@@ -15,7 +16,9 @@ const Picker = dynamic(
   { ssr: false }
 );
 
-export default function Home() {
+export default function Chat() {
+  const router = useRouter();
+
   const [userList, setUserList] = useState([
     "primeiro",
     "segundo",
@@ -45,6 +48,7 @@ export default function Home() {
 
   const handleLogoutClick = () => {
     console.log("Clicked on logout button ");
+    router.push("/");
   };
 
   return (
