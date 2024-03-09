@@ -13,28 +13,35 @@ body {
 }
 
 .chat-box {
-    height: 510px;
     border: 1px solid #ccc;
     border-radius: 0px;
-    padding: 8px; /* Ajuste conforme necessário */
     overflow: auto;
 }
 
 .messages-box {
-    height: 400px;
     border: 1px solid #ccc;
     border-radius: 0px;
-    padding: 8px; /* Ajuste conforme necessário */
     overflow: auto;
 }
 
 .user-list {
-    height: 80px;
+    border-top: 1px solid #ccc;
+    border-radius: 0px;
+    height: 100px;
 }
 
-.text-field {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 20px;
-    padding-bottom: 20px;
+.user-list:hover {
+    cursor: pointer;
+    background-color: aquamarine;
+}
+
+.sent-button:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+.emoji-picker {
+    overflow: visible;
+    z-index: 1;
+    margin-top: -380px;
 }
