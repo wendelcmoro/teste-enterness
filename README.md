@@ -13,11 +13,11 @@ Teste técnico enterness
    2.2 [Configurando ambiente local](##Configurando-ambiente-local)<br>
    2.3 [Executando projeto](##Executando-projeto)<br>
 
-# Execução do backend
+# 1 Execução do backend
 
-## Requisitos
+## 1.1 Requisitos
 
-## Configurando ambiente local
+## 1.2 Configurando ambiente local
 
 ## 1.3 Executando projeto
 
