@@ -25,7 +25,7 @@ body {
 }
 
 .user-list {
-    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
     border-radius: 0px;
     height: 100px;
 }
@@ -44,4 +44,26 @@ body {
     overflow: visible;
     z-index: 1;
     margin-top: -380px;
+}
+
+.message-sender {
+    background-color: bisque;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-right: 100px;
+    padding-left: 100px;
+    margin-left: 200px;
+    margin-right: 50px;
+    margin-top: 10px;
+}
+
+.message-receiver {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: lightblue;
+    padding-right: 100px;
+    margin-left: 50px;
+    margin-right: 50px;
 }

@@ -4,6 +4,7 @@ import { Container, Grid, TextField, Button } from "@mui/material";
 import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 
 export default function Home() {
   const router = useRouter();
@@ -19,11 +20,21 @@ export default function Home() {
       text: "",
     },
     validationSchema,
-    onSubmit: (values) => {
-      router.push({
-        pathname: "/chat",
-        query: { username: formik.values.text },
-      });
+    onSubmit: async (values) => {
+      try {
+        let data = {
+          name: formik.values.text,
+        };
+
+        const response = await axios.post(process.env.API_URL + "/users", data);
+
+        router.push({
+          pathname: "/chat",
+          query: { username: response.data.name, id: response.data.id },
+        });
+      } catch (error) {
+        console.error("Error on creating user:", error);
+      }
     },
   });
 

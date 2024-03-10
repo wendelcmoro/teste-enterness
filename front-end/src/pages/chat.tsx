@@ -8,6 +8,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import dynamic from "next/dynamic";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 import io from "socket.io-client";
 
@@ -37,23 +38,39 @@ export default function Chat() {
   // Lista de Mensagens
   const [messages, setMessages] = useState([]);
 
+  // Ajuste scrollbar
+  const messagesBoxRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (messagesBoxRef.current) {
+      messagesBoxRef.current.scrollTop = messagesBoxRef.current.scrollHeight;
+    }
+  };
+
   useEffect(() => {
+    scrollToBottom();
+
     if (router.query.username !== "") {
       const newUsername = router.query.username;
+      const newId = router.query.id;
       setUsername(newUsername);
+      setUserId(newId);
 
-      const auxSocket = io("http://localhost:3001");
+      //   console.log(userId);
 
-      console.log("authenticating");
+      const auxSocket = io(process.env.SOCKET_IO_URL);
+
+      //   console.log("authenticating");
       auxSocket.auth = {
         username: router.query.username,
+        id: router.query.id,
       };
 
       auxSocket.on("users", (users, id) => {
-        console.log("new user connected");
+        // console.log("new user connected");
         let auxUsers = [];
         for (let i = 0; i < users.length; i++) {
-          // if (users[i].name !== newUsername && users[i].id != id) {
+          //   if (users[i].name !== newUsername && users[i].id != id) {
           if (users[i].name !== newUsername) {
             auxUsers.push(users[i]);
           }
@@ -71,8 +88,10 @@ export default function Chat() {
           //   if (userToName == fromUsername && userToId == fromId) {
           if (userToName == fromUsername) {
             const auxMessages = [...messages];
-            auxMessages.push(content);
+            const auxContent = { sender: userToId, text: content };
+            auxMessages.push(auxContent);
             setMessages(auxMessages);
+            console.log(messages);
           }
         }
       );
@@ -87,22 +106,34 @@ export default function Chat() {
     } else {
       router.push("/");
     }
-  }, [router.query.username, username, messages]);
+  }, [router.query.username, router.query.id, username, messages]);
 
-  const handleUserClick = (destName, destId) => {
+  const handleUserClick = async (destName, destId) => {
     console.log("sendint to " + destId);
     setUserToName(destName);
     setUserToId(destId);
 
-    setMessages([]);
+    const response = await axios.get(
+      process.env.API_URL +
+        "/messages?sender=" +
+        userId +
+        "&receiver=" +
+        destId,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    console.log(messages);
+    // console.log(response.data);
+    setMessages(response.data);
+
+    // console.log(messages);
   };
 
-  const handleSendClick = () => {
+  const handleSendClick = async () => {
     if (socket) {
-      //   console.log(userToName, userToId);
-      //   console.log(username, userId);
       socket.emit("private message", {
         content: textMessage,
         toUsername: userToName,
@@ -113,8 +144,22 @@ export default function Chat() {
       setTextMessage("");
 
       const auxMessages = messages;
-      auxMessages.push(textMessage);
+      const auxContent = { sender: userId, text: textMessage };
+      auxMessages.push(auxContent);
       setMessages(messages);
+
+      let data = {
+        text: textMessage,
+        sender: userId,
+        receiver: userToId,
+      };
+
+      const response = await axios.post(
+        process.env.API_URL + "/messages",
+        data
+      );
+
+      scrollToBottom();
     }
 
     console.log("Clicked on send button ");
@@ -179,7 +224,7 @@ export default function Chat() {
                 spacing={2}
                 key={index}
                 className="user-list"
-                onClick={() => handleUserClick(item.name, item.id)}
+                onClick={() => handleUserClick(item.name, item.dbId)}
               >
                 <Grid item xs={2}>
                   <Box py={2}>
@@ -200,7 +245,13 @@ export default function Chat() {
               justifyContent="center"
               alignItems="center"
             >
-              <Grid item xs={12} className="messages-box" height={700}>
+              <Grid
+                item
+                xs={12}
+                className="messages-box"
+                height={700}
+                ref={messagesBoxRef}
+              >
                 <Grid
                   spacing={2}
                   container
@@ -208,8 +259,17 @@ export default function Chat() {
                   alignItems="center"
                 >
                   {messages.map((item, index) => (
-                    <Grid key={index} item xs={12}>
-                      {item}
+                    <Grid
+                      key={index}
+                      item
+                      xs={12}
+                      className={
+                        item.sender == userId
+                          ? "message-sender"
+                          : "message-receiver"
+                      }
+                    >
+                      {item.text}
                     </Grid>
                   ))}
                 </Grid>
