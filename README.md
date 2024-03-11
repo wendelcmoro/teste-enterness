@@ -83,7 +83,7 @@ Agora basta acessarmos a seguinte rota(se for a padrão) em um navegador de sua 
 
 ## 4.1 Instalando dependências
 
-Executar o comando no diretório do socket-io.server:
+Executar o comando no diretório do socket-io-server:
 
 ```console
 npm i
