@@ -41,6 +41,8 @@ Existe um arquivo **.env.example**, copiar este arquivo para um **.env** e subst
 cp .env.example .env
 ```
 
+Adicionalmente, foi adicionado um arquivo **.sql** na pasta do backend com nome **enterness.sql**, contendo os SCHEMAS de tabelas utilizadas no projeto backend em caso de necessidade, nele existe a criação de 2 duas tabelas, uma de usuários e outra de mensagens.
+
 ## 2.3 Executando projeto
 
 Para iniciar a execução do backend, basta executar o seguinte comando:
