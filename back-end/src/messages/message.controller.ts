@@ -15,10 +15,6 @@ export class MessageController {
     return this.messageService.findAll(sender, receiver);
   }
 
-  //   @Post()
-  //   create(@Body() message: Message): Promise<Message> {
-  //     return this.messageService.create(message);
-  //   }
   @Post()
   create(@Body() createMessageDto: CreateMessageDto): Promise<Message> {
     return this.messageService.create(createMessageDto);

@@ -16,6 +16,11 @@ body {
     border: 1px solid #ccc;
     border-radius: 0px;
     overflow: auto;
+    height: 810px;
+}
+
+.chat-container {
+    height: 810px;
 }
 
 .messages-box {
@@ -35,11 +40,6 @@ body {
     background-color: aquamarine;
 }
 
-.sent-button:hover {
-    cursor: pointer;
-    background-color: lightblue;
-}
-
 .emoji-picker {
     overflow: visible;
     z-index: 1;
@@ -56,6 +56,8 @@ body {
     margin-left: 200px;
     margin-right: 50px;
     margin-top: 10px;
+    word-wrap: break-word;
+    max-width: 100%;
 }
 
 .message-receiver {
@@ -66,4 +68,65 @@ body {
     padding-right: 100px;
     margin-left: 50px;
     margin-right: 50px;
+    margin-top: 10px;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+.emoji-button:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+.button-hover:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+.send-button:hover {
+    cursor: pointer;
+    background-color: lightblue;
+}
+
+@media (min-width: 1200px) {
+    .hide-logout-item-extra {
+        display: none;
+    }
+}
+
+@media (max-width: 1199px) {
+    .hide-names {
+        display: none;
+    }
+
+    .chat-container {
+        height: 300px;
+    }
+
+    .chat-box {
+        height: 500px;
+    }
+
+    .messages-box {
+        height: 400px;
+    }
+
+    .send-button {
+        margin-left: -50px;;
+    }
+    
+}
+
+@media (max-width: 899px) {
+    
+}
+
+@media (max-width: 599px) {
+    .emoji-button {
+        margin-left: -35px;
+    }
+
+    .emoji-picker {
+        margin-left: 40px;
+    }
 }

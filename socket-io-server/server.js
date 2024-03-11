@@ -12,52 +12,48 @@ const io = require("socket.io")(websocket, {
 
 io.use((socket, next) => {
   const username = socket.handshake.auth.username;
+  const id = socket.handshake.auth.id;
   if (!username) {
     return next(new Error("Username does not exist"));
   }
 
   socket.username = username;
+  socket.dbId = id;
   next();
 });
 
 io.on("connection", (socket) => {
   let users = [];
 
-  console.log("Someone has connected");
+  //   console.log("Someone has connected");
 
   for (let [id, socket] of io.of("/").sockets) {
-    const auxUser = { id: id, name: socket.username };
-    // socket.emit("users", auxUser);
+    const auxUser = { id: id, name: socket.username, dbId: socket.dbId };
     users.push(auxUser);
   }
+
+  // Envia lista de usuários conectados para o clientes
+  console.log(users);
   io.emit("users", users, socket.id);
   //   socket.emit("users", users, socket.id);
-
-  // Envia lista de usuários conectados para o cliente
-  console.log(users);
-  console.log(socket.id);
-  socket.emit("users", users, socket.id);
 
   socket.on(
     "private message",
     ({ content, toUsername, toId, fromUsername, fromId }) => {
-      console.log(
-        "Message to " + toUsername + " with id " + toId + ": " + content
-      );
-      console.log("Message from " + fromUsername + " with id " + fromId);
+      //   console.log(
+      //     "Message to " + toUsername + " with id " + toId + ": " + content
+      //   );
+      //   console.log("Message from " + fromUsername + " with id " + fromId);
 
-      for (let i = 0; i < users.length; i++) {
-        // if (users[i].username == toUsername && users[i].id == toId) {
-        if (users[i].name == toUsername) {
-          socket.to(users[i].id).emit("redirect message", {
+      for (let [id, socket] of io.of("/").sockets) {
+        if (socket.username == toUsername && socket.dbId == toId) {
+          socket.emit("redirect message", {
             content: content,
             toUsername: toUsername,
             toId: toId,
             fromUsername: fromUsername,
             fromId: fromId,
           });
-
-          console.log("redirecting message....");
         }
       }
     }
@@ -66,12 +62,12 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     users = [];
     for (let [id, socket] of io.of("/").sockets) {
-      const auxUser = { id: id, name: socket.username };
+      const auxUser = { id: id, name: socket.username, auxId: socket.auxId };
       users.push(auxUser);
     }
 
     io.emit("users", users, socket.id);
-    console.log("Disconnect");
+    // console.log("Disconnect");
   });
 });
 

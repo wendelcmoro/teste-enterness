@@ -17,6 +17,7 @@ const config: TypeOrmModuleOptions = {
   database: process.env.DB_DATABASE,
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
+  charset: 'utf8mb4',
 };
 
 export default config;

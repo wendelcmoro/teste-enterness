@@ -26,10 +26,6 @@ export class MessageService {
     return messages;
   }
 
-  //   async create(message: Message): Promise<Message> {
-  //     return this.messageRepository.save(message);
-  //   }
-
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
     const newMessage = this.messageRepository.create(createMessageDto);
     return this.messageRepository.save(newMessage);

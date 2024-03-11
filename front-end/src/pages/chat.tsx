@@ -56,21 +56,16 @@ export default function Chat() {
       setUsername(newUsername);
       setUserId(newId);
 
-      //   console.log(userId);
-
       const auxSocket = io(process.env.SOCKET_IO_URL);
 
-      //   console.log("authenticating");
       auxSocket.auth = {
         username: router.query.username,
         id: router.query.id,
       };
 
       auxSocket.on("users", (users, id) => {
-        // console.log("new user connected");
         let auxUsers = [];
         for (let i = 0; i < users.length; i++) {
-          //   if (users[i].name !== newUsername && users[i].id != id) {
           if (users[i].name !== newUsername) {
             auxUsers.push(users[i]);
           }
@@ -82,16 +77,11 @@ export default function Chat() {
       auxSocket.on(
         "redirect message",
         ({ content, toUsername, toId, fromUsername, fromId }) => {
-          console.log("received:" + content + " from " + fromUsername);
-
-          console.log(fromId);
-          //   if (userToName == fromUsername && userToId == fromId) {
-          if (userToName == fromUsername) {
+          if (userToName == fromUsername && userToId == fromId) {
             const auxMessages = [...messages];
             const auxContent = { sender: userToId, text: content };
             auxMessages.push(auxContent);
             setMessages(auxMessages);
-            console.log(messages);
           }
         }
       );
@@ -109,7 +99,6 @@ export default function Chat() {
   }, [router.query.username, router.query.id, username, messages]);
 
   const handleUserClick = async (destName, destId) => {
-    console.log("sendint to " + destId);
     setUserToName(destName);
     setUserToId(destId);
 
@@ -126,10 +115,7 @@ export default function Chat() {
       }
     );
 
-    // console.log(response.data);
     setMessages(response.data);
-
-    // console.log(messages);
   };
 
   const handleSendClick = async () => {
@@ -161,12 +147,9 @@ export default function Chat() {
 
       scrollToBottom();
     }
-
-    console.log("Clicked on send button ");
   };
 
   const handleLogoutClick = () => {
-    console.log("Clicked on logout button ");
     socket.disconnect();
     router.push("/");
   };
@@ -177,22 +160,22 @@ export default function Chat() {
         <Grid container spacing={2}>
           <Grid item xs={2} className="grid-border">
             <Grid container spacing={2}>
-              <Grid item xs={8}>
+              <Grid item xs={12} lg={8}>
                 <Grid container>
-                  <Grid item xs={3}>
+                  <Grid item xs={12} lg={4}>
                     <AccountCircleIcon fontSize="large" />
                   </Grid>
-                  <Grid item xs={9}>
+                  <Grid item lg={8} className="hide-names">
                     <Box my={1}>{username}</Box>
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={4}>
+              <Grid item lg={4} className="hide-names">
                 <Grid
                   container
                   spacing={2}
                   onClick={() => handleLogoutClick()}
-                  className="sent-button"
+                  className="button-hover"
                 >
                   <Grid item xs={12}>
                     <Box my={1} mx={3}>
@@ -205,19 +188,35 @@ export default function Chat() {
           </Grid>
 
           <Grid item xs={10} className="grid-border">
-            <Grid container spacing={2}>
-              <Grid item xs={1}>
-                <AccountCircleIcon fontSize="large" />
+            {userToName != "" && userToId != "" && (
+              <Grid container spacing={2}>
+                <Grid item xs={2} sm={1}>
+                  <AccountCircleIcon fontSize="large" />
+                </Grid>
+                <Grid item xs={8} sm={9} lg={11}>
+                  {userToName}
+                </Grid>
+                <Grid item xs={2} className="hide-logout-item-extra">
+                  <Grid
+                    container
+                    spacing={2}
+                    onClick={() => handleLogoutClick()}
+                    className="button-hover"
+                  >
+                    <Grid item xs={12}>
+                      <Box my={1} mx={3}>
+                        <LogoutIcon />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item xs={11}>
-                {userToName}
-              </Grid>
-            </Grid>
+            )}
           </Grid>
         </Grid>
 
-        <Grid container spacing={2} height={810} className="chat-container">
-          <Grid item xs={2} className="chat-box" height={810}>
+        <Grid container spacing={2} className="chat-container">
+          <Grid item xs={2} className="chat-box">
             {userList.map((item, index) => (
               <Grid
                 container
@@ -226,12 +225,12 @@ export default function Chat() {
                 className="user-list"
                 onClick={() => handleUserClick(item.name, item.dbId)}
               >
-                <Grid item xs={2}>
+                <Grid item xs={12} lg={2}>
                   <Box py={2}>
                     <AccountCircleIcon fontSize="medium" />
                   </Box>
                 </Grid>
-                <Grid item xs={10}>
+                <Grid item xs={10} className="hide-names">
                   <Box py={2}>{item.name}</Box>
                 </Grid>
               </Grid>
@@ -239,94 +238,103 @@ export default function Chat() {
           </Grid>
 
           <Grid item xs={10} className="chat-box">
-            <Grid
-              spacing={2}
-              container
-              justifyContent="center"
-              alignItems="center"
-            >
+            {userToName != "" && userToId != "" && (
               <Grid
-                item
-                xs={12}
-                className="messages-box"
-                height={700}
-                ref={messagesBoxRef}
+                spacing={2}
+                container
+                justifyContent="center"
+                alignItems="center"
               >
                 <Grid
-                  spacing={2}
-                  container
-                  justifyContent="center"
-                  alignItems="center"
+                  item
+                  xs={12}
+                  className="messages-box"
+                  height={700}
+                  ref={messagesBoxRef}
                 >
-                  {messages.map((item, index) => (
+                  <Grid
+                    spacing={2}
+                    container
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    {messages.map((item, index) => (
+                      <Grid
+                        key={index}
+                        item
+                        xs={12}
+                        className={
+                          item.sender == userId
+                            ? "message-sender"
+                            : "message-receiver"
+                        }
+                      >
+                        {item.text}
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Grid>
+
+                <Grid item xs={1} lg={1}>
+                  <Grid spacing={2} container>
                     <Grid
-                      key={index}
                       item
-                      xs={12}
-                      className={
-                        item.sender == userId
-                          ? "message-sender"
-                          : "message-receiver"
+                      xs={10}
+                      className="emoji-button"
+                      onClick={() =>
+                        showEmojiPicker
+                          ? setShowEmojiPicker(false)
+                          : setShowEmojiPicker(true)
                       }
                     >
-                      {item.text}
+                      <Box mx={3} my={4}>
+                        <InsertEmoticonIcon />
+                      </Box>
                     </Grid>
-                  ))}
-                </Grid>
-              </Grid>
-
-              <Grid item xs={1}>
-                <Grid spacing={2} container>
-                  <Grid
-                    item
-                    xs={10}
-                    className="sent-button"
-                    onClick={() =>
-                      showEmojiPicker
-                        ? setShowEmojiPicker(false)
-                        : setShowEmojiPicker(true)
-                    }
-                  >
-                    <Box mx={3} my={4}>
-                      <InsertEmoticonIcon />
-                    </Box>
+                    <Grid item xs={2}>
+                      <Picker
+                        open={showEmojiPicker}
+                        lazyLoadEmojis={true}
+                        className="emoji-picker"
+                        onEmojiClick={(event) => {
+                          const emoji = event.emoji;
+                          setTextMessage((prevText) => prevText + emoji);
+                          setShowEmojiPicker(false);
+                        }}
+                      />
+                    </Grid>
                   </Grid>
-                  <Grid item xs={2}>
-                    <Picker
-                      open={showEmojiPicker}
-                      lazyLoadEmojis={true}
-                      className="emoji-picker"
+                </Grid>
+
+                <Grid item xs={9} lg={10}>
+                  <Box>
+                    <TextField
+                      placeholder="Type your message here"
+                      fullWidth
+                      value={textMessage}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && textMessage.trim() !== "") {
+                          handleSendClick();
+                        }
+                      }}
+                      onChange={(e) => setTextMessage(e.target.value)}
+                      inputProps={{ inputMode: "text" }}
                     />
-                  </Grid>
+                  </Box>
+                </Grid>
+                <Grid
+                  item
+                  xs={2}
+                  lg={1}
+                  className="send-button"
+                  onClick={handleSendClick}
+                >
+                  <Box mx={5} my={4}>
+                    <SendIcon />
+                  </Box>
                 </Grid>
               </Grid>
-
-              <Grid item xs={10}>
-                <Box>
-                  <TextField
-                    placeholder="Type your message here"
-                    fullWidth
-                    value={textMessage}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && textMessage.trim() !== "") {
-                        handleSendClick();
-                      }
-                    }}
-                    onChange={(e) => setTextMessage(e.target.value)}
-                  />
-                </Box>
-              </Grid>
-              <Grid
-                item
-                xs={1}
-                className="sent-button"
-                onClick={handleSendClick}
-              >
-                <Box mx={5} my={4}>
-                  <SendIcon />
-                </Box>
-              </Grid>
-            </Grid>
+            )}
           </Grid>
         </Grid>
       </Box>
